@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-export default function useKeyboardStatus(Keyboard) {
+export default function keyboardStatus(Keyboard) {
   const [keyboardStatus, setKeyboardStatus] = useState(false);
 
   useEffect(() => {

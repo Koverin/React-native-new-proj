@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -9,12 +9,12 @@ import {
   KeyboardAvoidingView,
   Keyboard,
   TouchableWithoutFeedback,
-  ScrollView,
-  Platform,
+  Dimensions,
+  ImageBackground,
 } from "react-native";
-import useKeyboardStatus from "../hooks/useKeyboardStatus";
+import useKeyboardStatus from "../../hooks/keyboardStatus";
 
-const RegistrationScreen = ({ changeLog }) => {
+const RegistrationScreen = ({ navigation }) => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -25,13 +25,13 @@ const RegistrationScreen = ({ changeLog }) => {
   const [keyboardStatus] = useKeyboardStatus(Keyboard);
   const [avatar, setAvatar] = useState(true);
 
-  const toggleFocus = useCallback((type) => {
-    if (type === "name") setFocusName((prevFocus) => !prevFocus);
-    if (type === "email") setFocusEmail((prevFocus) => !prevFocus);
-    if (type === "password") setFocusPassword((prevFocus) => !prevFocus);
-  }, []);
+  const toggleFocus = (type) => {
+    if (type === "name") return setFocusName(!focusName);
+    if (type === "email") return setFocusEmail(!focusEmail);
+    if (type === "password") return setFocusPassword(!focusPassword);
+  };
 
-  const handleSubmit = useCallback(() => {
+  const handleSubmit = () => {
     const data = {
       name,
       email,
@@ -43,15 +43,19 @@ const RegistrationScreen = ({ changeLog }) => {
     setEmail("");
     setPassword("");
     Keyboard.dismiss();
-  }, [name, email, password]);
+  };
 
   return (
     <KeyboardAvoidingView
       style={{ flex: 1, width: "100%" }}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      behavior={Platform.OS == "ios" ? "padding" : "height"}
     >
       <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
         <View style={styles.container}>
+          <ImageBackground
+            source={require("../../assets/hill-bg-img.jpg")}
+            style={styles.image}
+          ></ImageBackground>
           <View
             style={{ ...styles.form, marginBottom: keyboardStatus ? -150 : 0 }}
           >
@@ -61,8 +65,8 @@ const RegistrationScreen = ({ changeLog }) => {
                   style={styles.icon}
                   source={
                     avatar
-                      ? require("../assets/add.png")
-                      : require("../assets/deleted.png")
+                      ? require("../../assets/add.png")
+                      : require("../../assets/deleted.png")
                   }
                 />
               </TouchableOpacity>
@@ -70,7 +74,7 @@ const RegistrationScreen = ({ changeLog }) => {
             <Text style={styles.title}>Реєстрація</Text>
             <TextInput
               inputmode="text"
-              onChangeText={setName}
+              onChangeText={(text) => setName(text)}
               onFocus={() => toggleFocus("name")}
               onBlur={() => toggleFocus("name")}
               style={{
@@ -83,7 +87,7 @@ const RegistrationScreen = ({ changeLog }) => {
             />
             <TextInput
               inputmode="email"
-              onChangeText={setEmail}
+              onChangeText={(text) => setEmail(text)}
               onFocus={() => toggleFocus("email")}
               onBlur={() => toggleFocus("email")}
               style={{
@@ -100,7 +104,7 @@ const RegistrationScreen = ({ changeLog }) => {
                 secureTextEntry={showPassword}
                 onFocus={() => toggleFocus("password")}
                 onBlur={() => toggleFocus("password")}
-                onChangeText={setPassword}
+                onChangeText={(text) => setPassword(text)}
                 style={{
                   ...styles.input,
                   borderColor: focusPassword ? "#FF6C00" : "#E8E8E8",
@@ -110,9 +114,7 @@ const RegistrationScreen = ({ changeLog }) => {
               />
               <TouchableOpacity
                 style={styles.showPass}
-                onPress={() =>
-                  setShowPassword((prevShowPassword) => !prevShowPassword)
-                }
+                onPress={() => setShowPassword(!showPassword)}
               >
                 <Text style={styles.textBtn}>Показати</Text>
               </TouchableOpacity>
@@ -122,7 +124,10 @@ const RegistrationScreen = ({ changeLog }) => {
                 Зареєстуватися
               </Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.loginLink} onPress={changeLog}>
+            <TouchableOpacity
+              style={styles.loginLink}
+              onPress={() => navigation.navigate("Login")}
+            >
               <Text style={styles.textBtn}>Вже є акаунт? Увійти</Text>
             </TouchableOpacity>
           </View>
@@ -135,6 +140,16 @@ const RegistrationScreen = ({ changeLog }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  image: {
+    flex: 1,
+    resizeMode: "cover",
+    position: "absolute",
+    left: 0,
+    top: 0,
+    bottom: 0,
+    width: Dimensions.get("window").width,
+    height: Dimensions.get("window").height,
   },
   form: {
     position: "relative",

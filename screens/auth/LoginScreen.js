@@ -8,27 +8,25 @@ import {
   KeyboardAvoidingView,
   Keyboard,
   TouchableWithoutFeedback,
-  Platform,
+  Dimensions,
+  ImageBackground,
 } from "react-native";
-import useKeyboardStatus from "../hooks/useKeyboardStatus";
+import useKeyboardStatus from "../../hooks/keyboardStatus";
 
-const LoginScreen = ({ changeLog }) => {
+const LoginScreen = ({ navigation }) => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(true);
-  const [focus, setFocus] = useState({
-    name: false,
-    email: false,
-    password: false,
-  });
+  const [focusName, setFocusName] = useState(false);
+  const [focusEmail, setFocusEmail] = useState(false);
+  const [focusPassword, setFocusPassword] = useState(false);
   const [keyboardStatus] = useKeyboardStatus(Keyboard);
 
-  const toggleFocus = (field) => {
-    setFocus((prevFocus) => ({
-      ...prevFocus,
-      [field]: !prevFocus[field],
-    }));
+  const toggleFocus = (type) => {
+    if (type === "name") return setFocusName(!focusName);
+    if (type === "email") return setFocusEmail(!focusEmail);
+    if (type === "password") return setFocusPassword(!focusPassword);
   };
 
   const handleSubmit = () => {
@@ -48,24 +46,28 @@ const LoginScreen = ({ changeLog }) => {
   return (
     <KeyboardAvoidingView
       style={{ flex: 1, width: "100%" }}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      behavior={Platform.OS == "ios" ? "padding" : "height"}
     >
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
         <View style={styles.container}>
+          <ImageBackground
+            source={require("../../assets/hill-bg-img.jpg")}
+            style={styles.image}
+          ></ImageBackground>
           <View
             style={{ ...styles.form, marginBottom: keyboardStatus ? -241 : 0 }}
           >
             <Text style={styles.title}>Увійти</Text>
 
             <TextInput
-              keyboardType="email-address"
-              onChangeText={setEmail}
+              inputMode="email"
+              onChangeText={(text) => setEmail(text)}
               onFocus={() => toggleFocus("email")}
               onBlur={() => toggleFocus("email")}
               style={{
                 ...styles.input,
                 marginBottom: 16,
-                borderColor: focus.email ? "#FF6C00" : "#E8E8E8",
+                borderColor: focusEmail ? "#FF6C00" : "#E8E8E8",
               }}
               value={email}
               placeholder="Адреса електронної пошти"
@@ -73,13 +75,14 @@ const LoginScreen = ({ changeLog }) => {
 
             <View style={styles.containerPassword}>
               <TextInput
+                inputMode="text"
                 secureTextEntry={showPassword}
                 onFocus={() => toggleFocus("password")}
                 onBlur={() => toggleFocus("password")}
-                onChangeText={setPassword}
+                onChangeText={(text) => setPassword(text)}
                 style={{
                   ...styles.input,
-                  borderColor: focus.password ? "#FF6C00" : "#E8E8E8",
+                  borderColor: focusPassword ? "#FF6C00" : "#E8E8E8",
                 }}
                 value={password}
                 placeholder="Пароль"
@@ -89,7 +92,7 @@ const LoginScreen = ({ changeLog }) => {
                 onPress={() => setShowPassword(!showPassword)}
               >
                 <Text style={styles.textBtn}>
-                  {showPassword ? "show" : "hide"}
+                  {showPassword ? "Показати" : "Скрити"}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -98,7 +101,10 @@ const LoginScreen = ({ changeLog }) => {
               <Text style={{ ...styles.textBtn, color: "#fff" }}>Увійти</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.loginLink} onPress={changeLog}>
+            <TouchableOpacity
+              style={styles.loginLink}
+              onPress={() => navigation.navigate("Registration")}
+            >
               <Text style={styles.textBtn}>Немає акаунту? Зареєструватися</Text>
             </TouchableOpacity>
           </View>
@@ -113,6 +119,16 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     resizeMode: "contain",
+  },
+  image: {
+    flex: 1,
+    resizeMode: "cover",
+    position: "absolute",
+    left: 0,
+    top: 0,
+    bottom: 0,
+    width: Dimensions.get("window").width,
+    height: Dimensions.get("window").height,
   },
   form: {
     paddingLeft: 16,

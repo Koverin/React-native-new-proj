@@ -1,10 +1,8 @@
 import { useFonts } from "expo-font";
-import { StatusBar } from "expo-status-bar";
-import { StyleSheet, View, ImageBackground, Dimensions } from "react-native";
+import { NavigationContainer } from "@react-navigation/native";
 import { useCallback, useState } from "react";
-import RegistrationScreen from "./screens/RegistrationScreen";
-import LoginScreen from "./screens/LoginScreen";
 import * as SplashScreen from "expo-splash-screen";
+import routerScreen from "./router";
 
 export default function App() {
   const [statusLog, setStatusLog] = useState(false);
@@ -24,39 +22,9 @@ export default function App() {
     return null;
   }
 
-  const chengeLog = () => setStatusLog(!statusLog);
-
   return (
-    <View style={{ flex: 1, backgroundColor: "#fff" }}>
-      <ImageBackground
-        style={styles.images}
-        source={require("./assets/hill-bg-img.jpg")}
-      ></ImageBackground>
-      <View style={styles.container} onLayout={onLayoutRootView}>
-        {statusLog ? (
-          <LoginScreen chengeLog={chengeLog} />
-        ) : (
-          <RegistrationScreen chengeLog={chengeLog} />
-        )}
-      </View>
-    </View>
+    <NavigationContainer onLayout={onLayoutRootView}>
+      {routerScreen(statusLog)}
+    </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  images: {
-    flex: 1,
-    resizeMode: "cover",
-    position: "absolute",
-    left: 0,
-    top: 0,
-    bottom: 0,
-    width: Dimensions.get("window").width,
-    height: Dimensions.get("window").height,
-  },
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});
