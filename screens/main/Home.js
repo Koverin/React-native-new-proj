@@ -2,14 +2,17 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { SimpleLineIcons } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
 import { Feather } from "@expo/vector-icons";
-import PostsScreen from "./PostsScreen";
+import PostsScreenNavigate from "./PostsScreenNavigate";
 import CreatePostsScreen from "./CreatePostsScreen";
 import ProfileScreen from "./ProfileScreen";
 import { View, TouchableOpacity, StyleSheet } from "react-native";
+import { useState } from "react";
 
 const BtmTabs = createBottomTabNavigator();
 
-const Home = () => {
+const Home = ({ navigation }) => {
+  const [bar, setBar] = useState(true);
+
   return (
     <BtmTabs.Navigator screenOptions={styles.container}>
       <BtmTabs.Screen
@@ -21,19 +24,43 @@ const Home = () => {
               </View>
             );
           },
+
+          headerShown: false,
+          tabBarStyle: bar
+            ? {
+                display: "flex",
+                height: 83,
+                paddingTop: 9,
+                paddingBottom: 34,
+              }
+            : { display: "none" },
         })}
-        name={"Публікації"}
-        component={PostsScreen}
-      />
+        name={"PostsScreenNavigate"}
+      >
+        {(props) => <PostsScreenNavigate {...props} bar={setBar} />}
+      </BtmTabs.Screen>
       <BtmTabs.Screen
+        backBehavior="history"
         options={() => ({
-          tabBarIcon: ({ focused, color, size }) => {
+          tabBarIcon: () => {
             return (
               <View style={styles.plus}>
                 <AntDesign name="plus" size={24} color={"white"} />
               </View>
             );
           },
+          tabBarHideOnKeyboard: true,
+          tabBarStyle: {
+            display: "none",
+          },
+          headerLeft: () => (
+            <TouchableOpacity
+              onPress={navigation.goBack}
+              style={{ marginLeft: 16 }}
+            >
+              <Feather name="arrow-left" size={24} color="#212121CC" />
+            </TouchableOpacity>
+          ),
         })}
         name={"Створити публікацію"}
         component={CreatePostsScreen}
@@ -48,7 +75,7 @@ const Home = () => {
             );
           },
         })}
-        name={"Профіль"}
+        name={"Профiль"}
         component={ProfileScreen}
       />
     </BtmTabs.Navigator>
@@ -57,14 +84,6 @@ const Home = () => {
 
 const styles = StyleSheet.create({
   container: {
-    headerRight: () => (
-      <TouchableOpacity
-        onPress={() => alert("This is a button!")}
-        style={styles.btnLogOut}
-      >
-        <Feather name="log-out" size={24} color="#BDBDBD" />
-      </TouchableOpacity>
-    ),
     headerStyle: {
       height: 88,
       borderBottomWidth: 1,
